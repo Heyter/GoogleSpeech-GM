@@ -25,6 +25,6 @@ netstream.Hook("goospeech.end", function(player)
 	set_voice(player)
 end)
 
-hook.Add("PlayerInitialSpawn", "goospeech.initialSpawn", function(player)
+hook.Add("PlayerInitialSpawn", "PlayerInitialSpawn_speechVoice", function(player)
 	set_voice(player)
 end)
