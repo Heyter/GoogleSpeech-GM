@@ -1,6 +1,4 @@
-if (!netlibs) then
-	return
-end
+if (not netlibs) then return end
 
 local phrases = {}
 phrases['en'] = {
@@ -32,7 +30,7 @@ local string_gsub, string_format, IsValid, ipairs = string.gsub, string.format, 
 
 local GoogleBool = CreateClientConVar("cl_google_enabled", "1", true)
 local GoogleInWorld = CreateClientConVar("cl_google_enabled_3d", "0", true)
-local GoogleVoice = CreateClientConVar("cl_google_voice", "oksana", true, true)
+local GoogleVoice = CreateClientConVar("cl_google__voice", goospeech['default_voice'], true, true)
 local GoogleURL = CreateClientConVar("cl_google_url", "0", true)
 
 local function httpUrlEncode(text) -- thanks to wiremod
@@ -71,15 +69,6 @@ hook.Add("OnPlayerChat", "OnPlayerChat_speech", function(player, text, bTeam, bD
 	end
 end)
 
-local voices = goospeech.voices
-local function GetVoices(ply)
-	for _, v in ipairs(voices) do
-		if (GoogleVoice:GetString() or goospeech:GetVoice(ply)) == v.en_name then
-			return v.ru_name
-		end
-	end
-end
-
 local menu
 netstream.Hook("goospeech.start", function()
 	local LANG = get_language()
@@ -98,26 +87,26 @@ netstream.Hook("goospeech.start", function()
 	voice:Dock(TOP)
 	voice:DockMargin(0,0,0,5)
 	voice:SetTooltip(LANG.menu_title)
-	voice:SetValue(GetVoices(LocalPlayer()))
-	for _, add in ipairs(voices) do
-		voice:AddChoice(add.ru_name)
+	voice:SetValue(goospeech:GetVoice(LocalPlayer()))
+
+	for name in pairs(goospeech.voices) do
+		voice:AddChoice(name)
 	end
+	
 	voice.OnSelect = function(idx, val, data)
-		for _, add in ipairs(voices) do
-			if data == add.ru_name then
-				RunConsoleCommand("cl_google_voice", add.en_name)
-				netstream.Start("goospeech.end")
-				break
-			end
-		end
+		RunConsoleCommand("cl_google__voice", data)
+		
+		timer.Simple(1, function()
+			netstream.Start("goospeech.end")
+		end)
 	end
 	
 	local sgs = menu:Add('DForm')
-	//sgs:SetTall(48)
 	sgs:Dock(FILL)
 	sgs:SetName(LANG.settings)
 	sgs:CheckBox(LANG.enable_tts, "cl_google_enabled")
 	sgs:CheckBox(LANG.enable_tts_3d, "cl_google_enabled_3d")
+	
 	local a = sgs:CheckBox(LANG.google_api, 'cl_google_url')
 	a:SetTooltip(LANG.google_api_tooltip)
 	a:SetChecked(GoogleURL:GetBool())

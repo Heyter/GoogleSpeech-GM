@@ -1,7 +1,4 @@
-if (!netlibs) then
-	ErrorNoHalt('Need install this addon https://github.com/Heyter/netlibrary\n')
-	return
-end
+assert(netlibs, "netlibs not installed (https://github.com/Heyter/netlibrary)")
 
 local goospeech = goospeech
 
@@ -15,16 +12,9 @@ hook.Add("PlayerSay", "PlayerSay_Google", function(player, text)
 	end
 end)
 
-local playerGetInfo = FindMetaTable("Player").GetInfo
-
 local function set_voice(pl)
-	goospeech:SetVoice(pl, playerGetInfo(pl, 'cl_google_voice'))
+	goospeech:SetVoice(pl, pl:GetInfo('cl_google__voice'))
 end
 
-netstream.Hook("goospeech.end", function(player)
-	set_voice(player)
-end)
-
-hook.Add("PlayerInitialSpawn", "PlayerInitialSpawn_speechVoice", function(player)
-	set_voice(player)
-end)
+netstream.Hook("goospeech.end", set_voice)
+hook.Add("PlayerInitialSpawn", "PlayerInitialSpawn_speechVoice", set_voice)
