@@ -4,8 +4,7 @@ local goospeech = goospeech
 
 hook.Add("PlayerSay", "PlayerSay_Google", function(player, text)
 	for _, cmd in ipairs(goospeech.ChatCommand) do
-		if string.len(cmd) > 0 and string.sub(text, 0, string.len(cmd)) == cmd then
-			if !goospeech:HasValue(player) then return end
+		if string.len(cmd) > 0 and string.sub(text, 0, string.len(cmd)) == cmd and goospeech:HasValue(player) then
 			netstream.Start(player, "goospeech.start")
 			return false
 		end
